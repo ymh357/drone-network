@@ -1,0 +1,93 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Write your model definitions here
+ */
+
+namespace org.drone.mynetwork
+
+/**
+ * A concept for the GPS address
+ */
+concept Address {
+  o String latitude
+  o CompassDirection latitudeDir
+  o String longitude
+  o CompassDirection longitudeDir
+}
+
+/**
+ * Directions of the compass
+ */
+enum CompassDirection {
+  o N
+  o S
+  o E
+  o W
+}
+
+/**
+ * An abstract participant type in this business network
+ */
+
+abstract participant Business identified by email {
+  o String email
+  o Address address
+  o Double accountBalance
+}
+
+participant Sender extends Business {
+}
+
+participant Middler extends Business {
+}
+
+participant Receiver extends Business {
+}
+
+asset MiddlerPassingRecord identified by middlerPassingRecordId {
+  o String middlerPassingRecordId
+  --> Sender sender
+  --> Middler middler
+  --> Receiver receiver
+  o DateTime passingDateTime
+  --> Contract contract
+}
+
+asset ShipmentRecord identified by shipmentRecordId {
+  o String shipmentRecordId
+  --> Sender sender
+  --> Receiver receiver
+  o DateTime arrivalDateTime
+  --> Contract contract
+}
+
+asset Contract identified by contractId {
+  o String contractId
+  o Double chargeForSenderForPassing
+  o Double chargeForReceiverForPassing
+  o Double shipmentHandleFee
+}
+
+transaction PassingMiddlerTransaction {
+  --> MiddlerPassingRecord middlerPassingRecord
+}
+
+transaction ShipmentArrivedTransaction{
+  --> ShipmentRecord shipmentRecord
+}
+
+transaction SimulateAppBehavior{
+}
